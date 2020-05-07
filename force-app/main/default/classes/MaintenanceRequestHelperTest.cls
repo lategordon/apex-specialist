@@ -32,7 +32,6 @@ public with sharing class MaintenanceRequestHelperTest {
     @isTest
     static void mrTest(){
         List<Case> mrTest = [SELECT Id ,Type,Status,Origin,AccountId,ContactId,Subject,Vehicle__c,Equipment__c FROM Case WHERE Status = 'Closed'];
-        //MaintenanceRequestHelper.routineCheckup(mrTest);
         List<Case> newCases = [SELECT Id,Type,Status,Origin,AccountId,ContactId,Subject,Vehicle__c,Equipment__c FROM Case WHERE Status = 'New'];
 
         System.assert(newCases != null);

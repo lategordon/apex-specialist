@@ -50,7 +50,6 @@ public with sharing class MaintenanceRequestTriggerTest {
         for(Case cs : c){
             cs.Status = 'Closed';
         }
-        //System.debug('Test Case is: ' + c);
         update c;
         Test.stopTest();
     }

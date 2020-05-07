@@ -1,16 +1,4 @@
 public with sharing class MaintenanceRequestHelper {
-    /*
-    When an existing maintenance request of type Repair or Routine Maintenance is Closed, 
-    you create a new maintenance request for a future routine checkup. This new request is 
-    tied to the same vehicle and piece of equipment to be serviced as the original closed service request. 
-    This new request's Type should be set as Routine Maintenance. The Subject should not be null and the 
-    Report Date field reflects the day the request was created. Another aspect about parts is they all have 
-    different lifespans. Therefore, you need to calculate and set the next due date using the maintenance cycle 
-    defined on the related work part records. If multiple work parts are used in the maintenance request, 
-    choose the shortest maintenance cycle to define the service date.
-
-    */
-
 /*routineCheckup method takes as input a list of Cases
 These cases have a status of Closed.
 routineCheckup will create a new maintenace request for a future routine checkup.
@@ -20,8 +8,6 @@ routineCheckup will create a new maintenace request for a future routine checkup
 - report date field is day the request was created (Today)
 - set due date using the maintenance cycle defined on related work parts.
 - if multiple work parts choose the shorted maintenance cyce to define the service date
-
-
 */
     public static void routineCheckup(List<Case> closedMaintenanceRequest, Map<Id, Case> closedMaintenanceRequestMap){
         List<Case> allNewMaintenanceRequests = new List<Case>();
@@ -54,14 +40,12 @@ routineCheckup will create a new maintenace request for a future routine checkup
         List<Work_Part__c> workParts = [SELECT Id, Equipment__c 
                               FROM Work_Part__c 
                               WHERE Maintenance_Request__c = :c.Id];
-       // System.debug('WorkParts '+ workParts.size() + ' ' + workParts);
         
         List<Id> equipIds = new List<Id>();
 
         for(Work_Part__c wp : workParts){
             equipIds.add(wp.Equipment__c);
         }
-       // System.debug('equipIds ' + equipIds);
         List<Product2> allEquipment = new List<Product2>();
         if(equipIds.size() >= 1){
                     allEquipment = [SELECT Maintenance_Cycle__c
@@ -71,18 +55,13 @@ routineCheckup will create a new maintenace request for a future routine checkup
         else{
             return 0;
         }
-                                    
-      //  System.debug('allEquipment ' + allEquipment);
         allEquipment.sort();
-      //  System.debug('allEquipment after sort ' + allEquipment);
-      //  System.debug(Integer.valueOf(allEquipment[0].Maintenance_Cycle__c));
-
         Return Integer.valueOf(allEquipment[0].Maintenance_Cycle__c);
 
     }
 
-
-
+    //updatedRelatedWorkParts method thas in a Map of Cases, and finds work orders related to them.
+    //It then copies the workPart and relates it back to the newly created routine maintenance
     private static void updateRelatedWorkParts(Map<Id, Case> closedWorkOrders){
         List<Work_Part__c> workParts = [SELECT Id, Name, Quantity__c, Maintenance_Request__c,Equipment__c
                                         FROM Work_Part__c  
